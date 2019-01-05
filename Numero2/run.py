@@ -6,8 +6,8 @@ def countE(proposition):
 def countWords(proposition):
     return len(proposition.split())
 
-def countConsecutive():
-    
+def countConsecutive(proposition):
+    return proposition.count(proposition[-1])
 
 
 if len(sys.argv) != 1:
