@@ -6,7 +6,10 @@ Le fichier `POST_alien.aln` contient un exemple de contenu POST pour ajouter un 
 Le fichier `GET_alien.aln` contient un exemple de réponse à un GET.
 
 ### Requis pour lancer
-* TODO
+* Install Flask and Python
+execute `python app.py`
+perform requests on 127.0.0.1:5000
+To add Alien --> Send JSON Object to the correct api as listed in the instructions
 
 ### Mise en contexte
 * TODO

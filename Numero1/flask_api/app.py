@@ -4,10 +4,6 @@ from flask import *
 app = Flask(__name__)
 app.secret_key = 'xyz'
 
-aliens = {}
-current_index = 0
-
-
 # post request must be in a form-data
 #@app.route('/image', methods=['GET', 'POST'])
 #def upload_file():
@@ -19,7 +15,7 @@ current_index = 0
 #@app.route('/qr/<string:qr>', methods=['PUT'])
 #def upload_qr_2_file(qr):
 
-@app.route('/api/alien', methods=['GET', 'POST'])
+@app.route('/api/alien/', methods=['GET', 'POST'])
 def alien():
     if request.method == 'GET':
         if 'aliens' not in session:
@@ -38,7 +34,7 @@ def alien():
         session['aliens'][str(session['current_index'])] = content
         content['id'] = session['current_index']
         session['current_index'] += 1
-        print(session['aliens'])
+
         return jsonify(content), 200
 
 
@@ -49,13 +45,32 @@ def modify_alien(id):
             if id in session['aliens']:
                 return jsonify(session['aliens'][id]), 200
 
-        return Response(400)
-        
+        return jsonify('Alien does not exist'), 400
+
     if request.method == 'DELETE':
-        del aliens[id]
+        if 'aliens' in session:
+            if id in session['aliens']:
+                aliens = session['aliens']
+                del aliens[id]
+                del session['aliens']
+                session['aliens'] = aliens
+                session.modified = True 
+                return "Alien Deleted"
+
+        return jsonify('alien does not exist'), 400
+
     if request.method == 'PUT':
-        content = request.json
-        aliens[id] = content
+        if 'aliens' in session:
+            if id in session['aliens']:
+                aliens = session['aliens']
+                aliens[id] = request.json
+                del session['aliens']
+                session['aliens'] = aliens
+
+                session.modified = True 
+                return jsonify(session['aliens'][id]), 200
+
+        return jsonify('alien does not exist'), 400
 
 
 @app.route('/')
@@ -64,4 +79,4 @@ def test():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', debug=True)
+    app.run(host='127.0.0.1')
