@@ -8,6 +8,7 @@ RSA crack.
 `start.sh 7 1037` is the expected format
 
 ### Required to launch
+- Python3 required
 - Run the install.sh to compile
 - Run the start.sh as above to run
 
