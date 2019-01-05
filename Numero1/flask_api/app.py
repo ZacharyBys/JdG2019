@@ -1,7 +1,8 @@
 import os
-from flask import Flask, request, redirect, url_for, send_from_directory, render_template
+from flask import *
 
 app = Flask(__name__)
+app.secret_key = 'xyz'
 
 aliens = {}
 current_index = 0
@@ -21,23 +22,35 @@ current_index = 0
 @app.route('/api/alien', methods=['GET', 'POST'])
 def alien():
     if request.method == 'GET':
-        return aliens
+        if 'aliens' not in session:
+            return "No Aliens"
+        else:
+            return jsonify(session['aliens']), 200
+
     if request.method == 'POST':
-        content = request.json
+        content = request.get_json()
 
-@app.route('/api/alien', methods=['POST'])
-def add_alien():
-    if not request.is_json:
-        return abort(400)
+        if 'current_index' not in session:
+            session['current_index'] = 0
+        if 'aliens' not in session:
+            session['aliens'] = {}
 
-    content = request.get_json()
-    print(content)
-    aliens[str(current_index)] = content
-    return "alien added"
+        session['aliens'][str(session['current_index'])] = content
+        content['id'] = session['current_index']
+        session['current_index'] += 1
+        print(session['aliens'])
+        return jsonify(content), 200
 
 
-@app.route('/api/alien/name/<string:id>', methods=['PUT', 'DELETE'])
+@app.route('/api/alien/name/<string:id>', methods=['PUT', 'DELETE', 'GET'])
 def modify_alien(id):
+    if request.method == 'GET':
+        if 'aliens' in session:
+            if id in session['aliens']:
+                return jsonify(session['aliens'][id]), 200
+
+        return Response(400)
+        
     if request.method == 'DELETE':
         del aliens[id]
     if request.method == 'PUT':
